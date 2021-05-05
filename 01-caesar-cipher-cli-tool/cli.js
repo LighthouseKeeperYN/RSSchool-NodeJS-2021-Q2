@@ -67,12 +67,9 @@ class CLI {
   static _runPipeline(readable, writable) {
     this._exceptionHandler()
 
-    // const encoder = new Encoder(readable)
-    const encoder = new Encoder({ input: readable, action: this.action, shift: this.shift })
     pipeline(
       readable,
-      // this.action === 'encode' ? encoder.encode : this._decoder,
-      encoder,
+      new Encoder({ input: readable, action: this.action, shift: this.shift }),
       writable,
       this._exceptionHandler
     )
@@ -83,15 +80,7 @@ class CLI {
     const readStream = this._getReadStream()
     const writeStream = this._getWriteStream()
     this._runPipeline(readStream, writeStream)
-    // console.log('test');
-    // if (!readStream) return
-    // console.log(readStream);
-    // this._getOptions()
-    // this._checkErrors()
   }
 }
 
-module.exports = CLI
-
 CLI.run()
-// console.log(cypher.getOptions);
