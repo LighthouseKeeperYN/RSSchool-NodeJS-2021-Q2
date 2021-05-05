@@ -1,35 +1,15 @@
 const fs = require('fs')
 const { pipeline } = require('stream');
 const { program } = require('commander');
+const Encoder = require('./encoder')
 
-// program
-//   .option('-s, --shift <value>', 'a shift')
-//   .option('-i, --input <value>', 'an input file')
-//   .option('-o, --output <value>', 'an output file')
-//   .option('-a, --action <value>', 'an action encode/decode')
-//   .parse(process.argv);
-// const { shift, input, output, action } = program.opts();
+// todo: handle input file error
 
-// const readable = input ? fs.createReadStream(input) : process.stdin
-// const writable = output ? fs.createWriteStream(output) : process.stdout
-
-// pipeline(
-//   readable,
-//   writable,
-//   (err) => {
-//     if (err) {
-//       console.error('Pipeline failed.', err);
-//     } else {
-//       console.log('Pipeline succeeded.');
-//     }
-//   },
-// )
-
-class Cypher {
-  static shift
-  static input
-  static output
-  static action
+class CLI {
+  shift
+  input
+  output
+  action
 
   static _getOptions() {
     program
@@ -60,16 +40,6 @@ class Cypher {
     return fs.createWriteStream(this.output)
   }
 
-  static _encoder(stream) {
-    console.log(stream);
-    return stream
-  }
-
-  static _decoder(stream) {
-    console.log(stream);
-    return stream
-  }
-
   static _exceptionHandler = (err) => {
     if (!this.shift) {
       process.stderr.write('Shift is required');
@@ -88,16 +58,21 @@ class Cypher {
       process.exit(9)
     }
     if (err) {
-      process.stderr.write('Could not read the file');
+      process.stderr.write('Unexpected error ocurred');
+      console.error(err)
       process.exit(1)
     }
   }
 
   static _runPipeline(readable, writable) {
     this._exceptionHandler()
+
+    // const encoder = new Encoder(readable)
+    const encoder = new Encoder({ input: readable, action: this.action, shift: this.shift })
     pipeline(
       readable,
-      this.action === 'encode' ? this._encoder : this._decoder,
+      // this.action === 'encode' ? encoder.encode : this._decoder,
+      encoder,
       writable,
       this._exceptionHandler
     )
@@ -116,5 +91,7 @@ class Cypher {
   }
 }
 
-Cypher.run()
+module.exports = CLI
+
+CLI.run()
 // console.log(cypher.getOptions);
