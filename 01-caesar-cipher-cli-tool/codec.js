@@ -25,12 +25,8 @@ class Encoder extends Transform {
   _shiftCharacter(char, shift) {
     const charCode = char.charCodeAt()
 
-    if (char === '\r') return '\r'
-    if (char === '\n') return '\n'
-
     if (!this._isLowerCase(char) && !this._isUpperCase(char)) {
-      process.stderr.write('Can not read input string');
-      process.exit(1)
+      return char
     }
 
     const start = this._isLowerCase(char) ? this._LOWER_CASE_STARTS_AT : this._UPPER_CASE_STARTS_AT

@@ -47,9 +47,7 @@ class CLI {
       return process.stdin
     }
 
-    return fs.createReadStream(this.input, {
-      flags: 'a'
-    }).on('error', () => {
+    return fs.createReadStream(this.input).on('error', () => {
       process.stderr.write('Input file does not exist or has unsupported format');
       process.exit(9)
     })
