@@ -1,4 +1,3 @@
-const { exit } = require('process');
 const { Transform } = require('stream');
 
 class Encoder extends Transform {
@@ -25,17 +24,18 @@ class Encoder extends Transform {
 
   _shiftCharacter(char, shift) {
     const charCode = char.charCodeAt()
-    if (!this._isLowerCase(char) && !this._isUpperCase) {
-      process.stderr.write('Can not read input string');
-      process.exit(1)
-    }
 
     if (char === '\r') return '\r'
     if (char === '\n') return '\n'
 
+    if (!this._isLowerCase(char) && !this._isUpperCase(char)) {
+      process.stderr.write('Can not read input string');
+      process.exit(1)
+    }
+
     const start = this._isLowerCase(char) ? this._LOWER_CASE_STARTS_AT : this._UPPER_CASE_STARTS_AT
-    const roundedShift = shift % this._CHARACTERS_IN_ALPHABET
-    const shiftedCharCode = ((charCode - start + roundedShift + this._CHARACTERS_IN_ALPHABET)
+    const mShift = shift % this._CHARACTERS_IN_ALPHABET
+    const shiftedCharCode = ((charCode - start + mShift + this._CHARACTERS_IN_ALPHABET)
       % this._CHARACTERS_IN_ALPHABET)
       + start
 

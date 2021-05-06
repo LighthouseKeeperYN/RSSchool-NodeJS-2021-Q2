@@ -1,9 +1,7 @@
 const fs = require('fs')
 const { pipeline } = require('stream');
 const { program } = require('commander');
-const Encoder = require('./encoder')
-
-// todo: handle input file error
+const Codec = require('./codec')
 
 class CLI {
   shift
@@ -20,6 +18,24 @@ class CLI {
       .parse(process.argv);
 
     const { shift, input, output, action } = program.opts()
+
+    if (!shift) {
+      process.stderr.write('Shift is required');
+      process.exit(9)
+    }
+    if (isNaN(shift) || !Number.isInteger(+shift)) {
+      process.stderr.write('Invalid shift value');
+      process.exit(9)
+    }
+    if (!action) {
+      process.stderr.write('Action is required');
+      process.exit(9)
+    }
+    if (action !== 'encode' && action !== 'decode') {
+      process.stderr.write('Unrecognized action');
+      process.exit(9)
+    }
+
     this.shift = shift
     this.input = input
     this.output = output
@@ -30,33 +46,29 @@ class CLI {
     if (!this.input) {
       return process.stdin
     }
-    return fs.createReadStream(this.input);
+
+    return fs.createReadStream(this.input, {
+      flags: 'a'
+    }).on('error', () => {
+      process.stderr.write('Input file does not exist or has unsupported format');
+      process.exit(9)
+    })
   }
 
   static _getWriteStream() {
     if (!this.output) {
       return process.stdout
     }
-    return fs.createWriteStream(this.output)
+
+    return fs.createWriteStream(this.output, {
+      flags: 'a'
+    }).on('error', () => {
+      process.stderr.write('Could not write to an output file');
+      process.exit(9)
+    })
   }
 
   static _exceptionHandler = (err) => {
-    if (!this.shift) {
-      process.stderr.write('Shift is required');
-      process.exit(9)
-    }
-    if (isNaN(this.shift)) {
-      process.stderr.write('Invalid shift value');
-      process.exit(9)
-    }
-    if (!this.action) {
-      process.stderr.write('Action is required');
-      process.exit(9)
-    }
-    if (this.action !== 'encode' && this.action !== 'decode') {
-      process.stderr.write('Unrecognized action');
-      process.exit(9)
-    }
     if (err) {
       process.stderr.write('Unexpected error ocurred');
       console.error(err)
@@ -65,11 +77,9 @@ class CLI {
   }
 
   static _runPipeline(readable, writable) {
-    this._exceptionHandler()
-
     pipeline(
       readable,
-      new Encoder({ input: readable, action: this.action, shift: this.shift }),
+      new Codec({ input: readable, action: this.action, shift: this.shift }),
       writable,
       this._exceptionHandler
     )
