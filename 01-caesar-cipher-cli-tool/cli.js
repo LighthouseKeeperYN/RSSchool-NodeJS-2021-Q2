@@ -49,7 +49,7 @@ class CLI {
 
     return fs.createReadStream(this.input).on('error', () => {
       process.stderr.write('Input file does not exist or has unsupported format');
-      process.exit(9)
+      process.exit(1)
     })
   }
 
@@ -62,7 +62,7 @@ class CLI {
       flags: 'a'
     }).on('error', () => {
       process.stderr.write('Could not write to an output file');
-      process.exit(9)
+      process.exit(1)
     })
   }
 
