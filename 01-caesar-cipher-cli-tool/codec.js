@@ -1,6 +1,6 @@
 const { Transform } = require('stream');
 
-class Encoder extends Transform {
+class Coder extends Transform {
   constructor(options) {
     super(options)
 
@@ -64,4 +64,4 @@ class Encoder extends Transform {
 }
 
 
-module.exports = Encoder
+module.exports = Coder
