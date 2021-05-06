@@ -1,18 +1,21 @@
 # Caesar-cipher-CLI-tool
 
-## Run app
+## Requirements
+  node.js v14.15.1 LTS
+
+## Installation
 
 1. Navigate to "01-caesar-cipher-cli-tool" folder
 
-        cd ./01-caesar-cipher-cli-tool
+        $ cd ./01-caesar-cipher-cli-tool
 
 2. Install dependencies
 
-        npm install
+        $ npm install
 
-3. Run script
+## Usage
 
-        node CLI <options>
+    $ node CLI <options>
 
 ## Options
 ##### Shift value (an integer) (required)
