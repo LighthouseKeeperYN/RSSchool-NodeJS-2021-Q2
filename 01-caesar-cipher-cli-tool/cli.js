@@ -47,8 +47,13 @@ class CLI {
       return process.stdin
     }
 
+    if (!fs.existsSync(this.input)) {
+      process.stderr.write('Input file does not exist');
+      process.exit(1)
+    }
+
     return fs.createReadStream(this.input).on('error', () => {
-      process.stderr.write('Input file does not exist or has unsupported format');
+      process.stderr.write('Could not read from input file');
       process.exit(1)
     })
   }
@@ -58,10 +63,15 @@ class CLI {
       return process.stdout
     }
 
+    if (!fs.existsSync(this.output)) {
+      process.stderr.write('Output file does not exist');
+      process.exit(1)
+    }
+
     return fs.createWriteStream(this.output, {
       flags: 'a'
     }).on('error', () => {
-      process.stderr.write('Could not write to an output file');
+      process.stderr.write('Could not write to output file');
       process.exit(1)
     })
   }
